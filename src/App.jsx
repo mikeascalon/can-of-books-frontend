@@ -12,10 +12,12 @@ import {
 } from "react-router-dom";
 import { useState, useEffect } from 'react';
 import About from './About.jsx'
+import AddBook from './BookFormModal'
 
 
 
 const SERVER = import.meta.env.VITE_SERVER_URL
+const API_URL = `${SERVER}/books`;
 
 function App() {
   const [books, setBooks] = useState([]);
@@ -47,6 +49,33 @@ function App() {
     fetchBooks(title);
   }
 
+  function handleAddBookSubmit(event) {
+    event.preventDefault();
+    const title = event.target.title.value;
+    fetchBooks(title);
+  }
+
+  async function handleBookCreate(bookData) {
+    const response = await axios.post(API_URL, bookData);
+    const newBook = response.data;
+    setBooks([...books, newBook]);
+
+  }
+
+  async function handleDelete(bookToDelete) {
+    const url = `${API_URL}/${bookToDelete._id}`;
+
+    try {
+      await axios.delete(url);
+      const filteredBooks = books.filter(book => book._id !== bookToDelete._id);
+      setBooks(filteredBooks);
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+
+
 
   return (
     <>
@@ -60,7 +89,8 @@ function App() {
         <Routes>
           <Route exact path="/" element={
             <div>
-              <BestBooks books={books} />
+              <BestBooks books={books}
+                onDelete={handleDelete} />
               <h2>Filter by Title</h2>
               <form onSubmit={handleTitleSubmit}>
                 <input name="title" />
@@ -70,8 +100,15 @@ function App() {
             </div>
           } />
           <Route path="/about" element={About()
-            
+
           } />
+          <Route path="create" element={
+            <AddBook onCreate={handleBookCreate} />
+          } />
+          <form onSubmit={handleAddBookSubmit}>
+                <input name="title" />
+                <button>ok</button>
+              </form>
         </Routes>
         <Footer />
       </Router >
