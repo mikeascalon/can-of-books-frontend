@@ -7,9 +7,12 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import {
   BrowserRouter as Router,
   Routes,
-  Route
+  Route,
+  Link,
 } from "react-router-dom";
 import { useState, useEffect } from 'react';
+import About from './About.jsx'
+
 
 
 const SERVER = import.meta.env.VITE_SERVER_URL
@@ -24,6 +27,10 @@ function App() {
   async function fetchBooks(title = null) {
     let apiUrl = `${SERVER}/books`;
 
+    if (title) {
+      apiUrl += `?title=${title}`;
+    }
+
 
     try {
       const response = await axios.get(apiUrl);
@@ -34,22 +41,42 @@ function App() {
     }
   }
 
-  render();
+  function handleTitleSubmit(event) {
+    event.preventDefault();
+    const title = event.target.title.value;
+    fetchBooks(title);
+  }
+
 
   return (
     <>
       <Router>
+        <nav>
+          <h1>Can of Books</h1>
+          <Link to="/">Home</Link>
+          <Link to="/about">About</Link>
+        </nav>
         <Header />
         <Routes>
-          <Route
-            exact path="/"
-            element={<BestBooks books={books} />} />
-        {/* PLACEHOLDER: add a route with a path of '/about' that renders the `About` component */}
-      </Routes>
-      <Footer />
-    </Router >
-      </>
-    );
+          <Route exact path="/" element={
+            <div>
+              <BestBooks books={books} />
+              <h2>Filter by Title</h2>
+              <form onSubmit={handleTitleSubmit}>
+                <input name="title" />
+                <button>ok</button>
+              </form>
+
+            </div>
+          } />
+          <Route path="/about" element={About()
+            
+          } />
+        </Routes>
+        <Footer />
+      </Router >
+    </>
+  );
 
 }
 
