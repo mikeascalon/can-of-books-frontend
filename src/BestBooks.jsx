@@ -1,6 +1,7 @@
 import React from 'react';
 // import Bootstrap from 'react-bootstrap'
 import { Carousel } from 'react-bootstrap';
+
 const SERVER = import.meta.env.VITE_SERVER_URL
 
 class BestBooks extends React.Component {
@@ -17,7 +18,7 @@ class BestBooks extends React.Component {
   componentDidMount() {
 
     const apiUrl = `${SERVER}/books`;
-    console.log('Fetching from:', apiUrl);
+    // console.log('Fetching from:', apiUrl);
 
     fetch(apiUrl)
       .then((response) => response.json())
@@ -33,41 +34,61 @@ class BestBooks extends React.Component {
   }
 
 
+  handleDelete = (bookId) => {
+    // Implement your logic to delete the book with the given bookId
+    console.log(`Deleting book with ID: ${bookId}`);
+  };
+
   renderBooksCarousel() {
     const { books } = this.state;
 
+
+
+    console.log(books)
     return (
-      <Carousel fade>
-        {books.map((book) => (
-          <Carousel.Item key={book._id}>
-            {/* Assuming your book object has properties like title, image, etc. */}
-            <img
-              className="d-block w-100"
-              src={book.image}
-              alt={book.title}
-            />
-            <Carousel.Caption>
-              <h3>{book.title}</h3>
-              <p>{book.description}</p>
-              <p>Status: {book.status}</p>
-            </Carousel.Caption>
-          </Carousel.Item>
-        ))}
-      </Carousel>
+      <>
+        <Carousel fade style={{ height: '200px' }}>
+          {books.map((book) => (
+            <Carousel.Item key={book._id}>
+
+             
+                <h3>{book.title}</h3>
+                <p>{book.description}</p>
+                <p>Status: {book.status}</p>
+               
+              
+            </Carousel.Item>
+          ))}
+        </Carousel>
+
+      </>
     );
   }
 
   render() {
+
+    const { books } = this.state;
+    console.log(books)
     return (
       <>
         <h2>My Essential Lifelong Learning &amp; Formation Shelf</h2>
 
-        {
-          this.state.books.length ? (
-             this.renderBooksCarousel()
-          ) : (
-            <h3>No Books Found :</h3>
-          )
+        {books.length ? (
+          <>
+            <div>
+              {books.map((book) => (
+                <h3 key={book._id}>
+                  {book.title}
+                  <button onClick={() => this.props.onDelete(book)}>Delete</button>
+                </h3>
+              ))}
+            </div>
+
+            {this.renderBooksCarousel()}
+          </>
+        ) : (
+          <h4>No Books Found :</h4>
+        )
         }
       </>
     )

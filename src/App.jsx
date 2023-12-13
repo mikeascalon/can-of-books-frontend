@@ -12,7 +12,8 @@ import {
 } from "react-router-dom";
 import { useState, useEffect } from 'react';
 import About from './About.jsx'
-import AddBook from './BookFormModal'
+import AddBook from './BookFormModal.jsx'
+import './App.css';
 
 
 
@@ -21,6 +22,7 @@ const API_URL = `${SERVER}/books`;
 
 function App() {
   const [books, setBooks] = useState([]);
+  const [showAddBookModal, setShowAddBookModal] = useState(false);
 
   useEffect(() => {
     fetchBooks();
@@ -84,6 +86,7 @@ function App() {
           <h1>Can of Books</h1>
           <Link to="/">Home</Link>
           <Link to="/about">About</Link>
+          <button onClick={() => setShowAddBookModal(true)}>Add Book</button> {/* Open modal */}
         </nav>
         <Header />
         <Routes>
@@ -99,18 +102,26 @@ function App() {
 
             </div>
           } />
-          <Route path="/about" element={About()
-
-          } />
-          <Route path="create" element={
-            <AddBook onCreate={handleBookCreate} />
-          } />
-          <form onSubmit={handleAddBookSubmit}>
+          <Route path="/about" element={<About />} />
+          <Route path="/create" element={
+            <div>
+              <AddBook onCreate={handleBookCreate} />
+              <form onSubmit={handleAddBookSubmit}>
                 <input name="title" />
                 <button>ok</button>
               </form>
+            </div>
+          } />
         </Routes>
         <Footer />
+        {showAddBookModal && ( // Display modal if showAddBookModal is true
+          <AddBook
+            onCreate={(bookData) => {
+              handleBookCreate(bookData);
+              setShowAddBookModal(false); // Close modal after creating book
+            }}
+          />
+        )}
       </Router >
     </>
   );
