@@ -1,6 +1,7 @@
 import React from 'react';
 // import Bootstrap from 'react-bootstrap'
 import { Carousel } from 'react-bootstrap';
+import UpdateBook from './UpdateBookModal.jsx'
 
 const SERVER = import.meta.env.VITE_SERVER_URL
 
@@ -80,6 +81,8 @@ class BestBooks extends React.Component {
                 <h3 key={book._id}>
                   {book.title}
                   <button onClick={() => this.props.onDelete(book)}>Delete</button>
+                  <button onClick={() => this.props.onUpdate(book)}>Update</button>
+
                 </h3>
               ))}
             </div>
