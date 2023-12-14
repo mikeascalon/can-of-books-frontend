@@ -17,12 +17,13 @@ import './App.css';
 
 
 
+
 const SERVER = import.meta.env.VITE_SERVER_URL
 const API_URL = `${SERVER}/books`;
 
 function App() {
   const [books, setBooks] = useState([]);
-  const [showAddBookModal, setShowAddBookModal] = useState(false);
+  const [showAddBookModal, setShowAddBookModal] = useState(true);
 
   useEffect(() => {
     fetchBooks();
@@ -51,16 +52,22 @@ function App() {
     fetchBooks(title);
   }
 
-  function handleAddBookSubmit(event) {
-    event.preventDefault();
-    const title = event.target.title.value;
-    fetchBooks(title);
-  }
+  // function handleAddBookSubmit(event) {
+  //   event.preventDefault();
+  //   const title = event.target.title.value;
+  //   fetchBooks(title);
+  // }
 
   async function handleBookCreate(bookData) {
+    try{
     const response = await axios.post(API_URL, bookData);
     const newBook = response.data;
     setBooks([...books, newBook]);
+     } catch (error) {
+      console.error('Error creating book:', error);
+     }
+
+    
 
   }
 
@@ -76,6 +83,17 @@ function App() {
     }
   }
 
+  async function handleUpdate(bookToUpdate) {
+    const url = `${API_URL}/${bookToUpdate._id}`;
+
+    try {
+      await axios.put(url, bookToUpdate);
+      const updatedBook = books.map(book => book._id === bookToUpdate._id ? bookToUpdate : book);
+      setBooks(updatedBook);
+    } catch (error) {
+      console.error(error);
+    }
+  }
 
 
 
@@ -86,14 +104,23 @@ function App() {
           <h1>Can of Books</h1>
           <Link to="/">Home</Link>
           <Link to="/about">About</Link>
-          <button onClick={() => setShowAddBookModal(true)}>Add Book</button> {/* Open modal */}
         </nav>
         <Header />
-        <Routes>
+        {showAddBookModal&& ( // Display modal if showAddBookModal is true
+          <AddBook
+            onCreate={(newBook) => {
+              handleBookCreate(newBook);
+              setShowAddBookModal(false); // Close modal after creating book
+            }}
+          />
+        )}
+        <Routes >
+          
           <Route exact path="/" element={
             <div>
               <BestBooks books={books}
-                onDelete={handleDelete} />
+                onDelete={handleDelete}
+                onUpdate={handleUpdate} />
               <h2>Filter by Title</h2>
               <form onSubmit={handleTitleSubmit}>
                 <input name="title" />
@@ -103,25 +130,9 @@ function App() {
             </div>
           } />
           <Route path="/about" element={<About />} />
-          <Route path="/create" element={
-            <div>
-              <AddBook onCreate={handleBookCreate} />
-              <form onSubmit={handleAddBookSubmit}>
-                <input name="title" />
-                <button>ok</button>
-              </form>
-            </div>
-          } />
+          <Route/>
         </Routes>
         <Footer />
-        {showAddBookModal && ( // Display modal if showAddBookModal is true
-          <AddBook
-            onCreate={(bookData) => {
-              handleBookCreate(bookData);
-              setShowAddBookModal(false); // Close modal after creating book
-            }}
-          />
-        )}
       </Router >
     </>
   );
