@@ -19,28 +19,28 @@ function AddBook({ onCreate}) {
     event.preventDefault();
     await onCreate(book);
     handleClose();
-
+    setBook({ title: '', description: '', status: false });
     }
+    
 
     return (
       <>
         <Button variant="primary" onClick={handleShow}>
           Add Book
         </Button>
-
         <Modal show={show} onHide={handleClose}>
           <Modal.Header closeButton>
-            <Modal.Title>Modal heading</Modal.Title>
+            <Modal.Title>Add a Book</Modal.Title>
           </Modal.Header>
           <Modal.Body>
             <Form>
-              <Form.Group className="mb-3" controlId="AddBookFormTitle.ControlInput1" >
+              <Form.Group className="mb-3" >
                 <Form.Label>Title</Form.Label>
                 <Form.Control
                   type="text"
                   placeholder="Book Title"
                   autoFocus
-                  id="addBookFormTitle"  // Added the id attribute
+                  id="addBookFormTitle"  
                   value={book.title}  // Added the value attribute bound to the book state
                   onChange={(e) => setBook({ ...book, title: e.target.value })}  // Added the onChange event
 
@@ -48,7 +48,7 @@ function AddBook({ onCreate}) {
               </Form.Group>
               <Form.Group
                 className="mb-3"
-                controlId="AddBookFormDescription.ControlTextarea1"
+                
               >
                 <Form.Label>Description</Form.Label>
                 <Form.Control
@@ -65,7 +65,7 @@ function AddBook({ onCreate}) {
             <Button variant="secondary" onClick={handleClose}>
               Close
             </Button>
-            <Button variant="primary" onClick={handleClose}>
+            <Button variant="primary" onClick={handleSubmit}>
               Save Book
             </Button>
           </Modal.Footer>

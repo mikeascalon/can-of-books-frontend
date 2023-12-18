@@ -1,101 +1,75 @@
-import React from 'react';
-// import Bootstrap from 'react-bootstrap'
+import React, { useState, useEffect } from 'react';
 import { Carousel } from 'react-bootstrap';
-import UpdateBook from './UpdateBookModal.jsx'
+import UpdateBook from './UpdateBookModal.jsx';
 
-const SERVER = import.meta.env.VITE_SERVER_URL
+const SERVER = import.meta.env.VITE_SERVER_URL;
 
-class BestBooks extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      books: []
-    }
-  }
+function BestBooks(props) {
+  
 
-
-  /* TODO: Make a GET request to your API to fetch all the books from the database  */
-
-  componentDidMount() {
-
+  useEffect(() => {
     const apiUrl = `${SERVER}/books`;
-    // console.log('Fetching from:', apiUrl);
 
     fetch(apiUrl)
       .then((response) => response.json())
       .then((data) => {
         console.log('Books fetched successfully:', data);
-        // Update the state with the fetched books
-        this.setState({ books: data });
+        props.setBooks(data);
       })
       .catch((error) => {
         console.error('Error fetching books:', error);
       });
-    /* TODO: render all the books in a Carousel */
-  }
+  }, []);
 
 
-  handleDelete = (bookId) => {
-    // Implement your logic to delete the book with the given bookId
-    console.log(`Deleting book with ID: ${bookId}`);
-  };
-
-  renderBooksCarousel() {
-    const { books } = this.state;
-
-
-
-    console.log(books)
+  function renderBooksCarousel() {
+    console.log(props.books);
     return (
       <>
         <Carousel fade style={{ height: '200px' }}>
-          {books.map((book) => (
+          {props.books.map((book) => (
             <Carousel.Item key={book._id}>
-
-             
-                <h3>{book.title}</h3>
-                <p>{book.description}</p>
-                <p>Status: {book.status}</p>
-               
-              
+              <h3>{book.title}</h3>
+              <p>{book.description}</p>
+              <p>Status: {book.status}</p>
             </Carousel.Item>
           ))}
         </Carousel>
-
+{props.show && (<UpdateBook setBooks={props.setBooks} show={props.show} books={props.books}/>)}
       </>
     );
   }
 
-  render() {
-
-    const { books } = this.state;
-    console.log(books)
-    return (
-      <>
-        <h2>My Essential Lifelong Learning &amp; Formation Shelf</h2>
-
-        {books.length ? (
-          <>
-            <div>
-              {books.map((book) => (
-                <h3 key={book._id}>
-                  {book.title}
-                  <button onClick={() => this.props.onDelete(book)}>Delete</button>
-                  <button onClick={() => this.props.onUpdate(book)}>Update</button>
-
-                </h3>
-              ))}
-            </div>
-
-            {this.renderBooksCarousel()}
-          </>
-        ) : (
-          <h4>No Books Found :</h4>
-        )
-        }
-      </>
-    )
-  }
+  return (
+    <>
+      <h2>My Essential Lifelong Learning &amp; Formation Shelf</h2>
+      {props.books.length ? (
+        <>
+          <div>
+            {props.books.map((book) => (
+              <h3 key={book._id}>
+                {book.title}
+                <button onClick={() => props.handleDelete(book._id)}>Delete</button>
+                <button onClick={() => props.onUpdate(book)}>Update</button>
+                
+             
+              </h3>
+            ))}
+          </div>
+          {props.show && (
+            <UpdateBook
+              setBooks={props.setBooks}
+              show={props.show}
+              bookToUpdate={props.bookToUpdate}
+            />
+          )}
+          {renderBooksCarousel()}
+        </>
+      ) : (
+        <h4>No Books Found :</h4>
+      )}
+    </>
+  );
 }
 
 export default BestBooks;
